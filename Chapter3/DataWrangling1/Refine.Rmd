@@ -1,0 +1,66 @@
+---
+title: "DataWrangling1"
+author: "Charles Hall"
+date: "May 16, 2016"
+output: html_document
+---
+Submitted for Springboard data wrangling exercise 1
+Charles Hall
+
+Load the dplyr and tidy packages
+```{r}
+library(dplyr)
+library(tidyr)
+```
+
+0: Load the data in RStudio
+
+```{r}
+to_refine <- read.csv("c:/Users/CMH/Desktop/DataScience/springboard/Chapter3/refine_original.csv")
+to_refine <- tbl_df(to_refine)
+```
+
+1: Clean up brand names
+```{r}
+to_refine$company <- lapply(to_refine$company, tolower)
+
+to_refine$company <- sub("ph.*", "phillips", unlist(to_refine$company))
+to_refine$company <- sub("fil.*", "phillips", unlist(to_refine$company))
+to_refine$company <- sub("ak.*", "akzo", unlist(to_refine$company))
+to_refine$company <- sub("unil.*", "unilever", unlist(to_refine$company))
+```
+
+2: Separate product code and number
+```{r}
+to_refine <- to_refine %>% separate(col = Product.code...number, into = c("product_code", "product_number"), sep = "-")
+```
+
+3: Add product categories
+```{r}
+lut <- c("p" = "Smartphone", "v" = "TV", "x" = "Laptop", "q" = "Tablet")
+to_refine$product_code <- lut[to_refine$product_code]
+```
+
+4: Add full address for geocoding
+```{r}
+to_refine <- mutate(to_refine, full_address = paste(to_refine$address, to_refine$city, to_refine$country, seperator=" "))
+```
+
+5: Create dummy variables for company and product category
+```{r}
+to_refine <- mutate(to_refine, company_phillips = grepl("phillips", to_refine$company))
+to_refine <- mutate(to_refine, company_akzo = grepl("akzo", to_refine$company))
+to_refine <- mutate(to_refine, company_van_houten = grepl("van houten", to_refine$company))
+to_refine <- mutate(to_refine, company_unilever = grepl("unilever", to_refine$company))
+
+to_refine <- mutate(to_refine, product_smartphone = grepl("Smartphone", to_refine$product_code))
+to_refine <- mutate(to_refine, product_tv = grepl("TV", to_refine$product_code))
+to_refine <- mutate(to_refine, product_laptop = grepl("Laptop", to_refine$product_code))
+to_refine <- mutate(to_refine, product_tablet = grepl("Tablet", to_refine$product_code))
+```
+
+6: Submit the project on Github
+```{r}
+write.csv(to_refine, file = "c:/Users/CMH/Desktop/DataScience/springboard/Chapter3/refine_clean.csv")
+```
+
