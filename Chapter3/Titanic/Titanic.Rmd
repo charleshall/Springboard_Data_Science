@@ -1,0 +1,51 @@
+---
+title: "Titanic Data"
+author: "Charles Hall"
+date: "May 17, 2016"
+output: html_document
+---
+
+0: Load the data in RStudio
+
+Load tidyr abd dplyr. Read the csv and convert blanks to proper NA values.
+
+```{r}
+library(tidyr)
+library(dplyr)
+
+ti_tanic <- read.csv("c:/Users/CMH/Desktop/DataScience/springboard/Chapter3/titanic/titanic_original.csv", header=T, na.strings=c(""," ","NA"))
+ti_tanic <- tbl_df(ti_tanic)
+```
+
+1: Port of embarkation
+Convert all <NA> values to S. 
+```{r}
+ti_tanic$embarked[is.na(ti_tanic$embarked)] <- c("S")
+```
+
+2: Age
+Replace missing ages with the mean age.
+I would consider a regression or something similar to find a better age replacement.
+I would also consider the cabin and sex. eg. Partner or child.
+```{r}
+ti_tanic$age[is.na(ti_tanic$age)] <- mean(ti_tanic$age, na.rm=TRUE)
+```
+
+3: Lifeboat
+I do not run this command because the na.strings in the read.csv converts these to R <NA> values,
+which I believe could bemore useful. I inclded this line in the interest of completeness.
+```{r}
+#ti_tanic$boat[is.na(ti_tanic$boat)] <- c("None")
+```
+
+4: Cabin
+```{r}
+ti_tanic <- ti_tanic %>%
+  mutate(has_cabin_number = !is.na(ti_tanic$boat))
+```
+
+6: Submit the project on Github
+This should probably be 5
+```{r}
+write.csv(to_refine, file = "c:/Users/CMH/Desktop/DataScience/springboard/Chapter3/titanic/titanic_clean.csv")
+```
